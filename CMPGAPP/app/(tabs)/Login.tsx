@@ -7,19 +7,7 @@ import Constants from 'expo-constants';
 
 const url = Constants.expoConfig?.extra?.MongoURL ?? '';
 
-// Define RootStackParamList directly in this file if it doesn't exist
-type RootStackParamList = {
-  Login: undefined;
-  Home: undefined;
-};
-
-type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
-
-interface Props {
-  navigation: LoginScreenNavigationProp;
-}
-
-const LoginScreen = ({ navigation }: Props) => {
+const LoginScreen = () => {
   const [userNumber, setUserNumber] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -38,7 +26,6 @@ const LoginScreen = ({ navigation }: Props) => {
 
       if (response.ok) {
         await AsyncStorage.setItem('token', data.token); // Store the token securely
-        navigation.navigate('Home'); // Redirect to the home screen after successful login
       } else {
         setError(data.message); // Display error message
       }
@@ -52,20 +39,34 @@ const LoginScreen = ({ navigation }: Props) => {
   };
 
   return (
-    <View>
+    <View style=
+    {{ 
+      marginTop: 10,
+      width: '75%',
+      alignSelf: 'center',
+
+    }}>
       <TextInput
+        style = {{marginTop: 100, height: 40, fontSize: 30, borderColor: 'Black', borderWidth: 2}}
         placeholder="User Number"
-        value={userNumber}
-        onChangeText={(text) => setUserNumber(text)}
+        onChangeText={(userNumber) => setUserNumber(userNumber)}
         keyboardType="numeric"
+        value={userNumber}
       />
       <TextInput
+        style = {{marginTop: 10, height: 40, fontSize: 30, borderColor: 'Black', borderWidth: 2}}
         placeholder="Password"
+        onChangeText={(password) => setPassword(password)}
         value={password}
-        onChangeText={(text) => setPassword(text)}
         secureTextEntry
-      />
-      <Button title="Login" onPress={handleLogin} />
+        />
+
+      <View style={{ marginTop: 10 }}>
+        <Button 
+          title="Login" 
+          onPress={handleLogin} 
+        />
+      </View>
       {error && <Text>{error}</Text>}
     </View>
   );
