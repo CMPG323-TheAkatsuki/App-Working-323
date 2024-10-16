@@ -1,16 +1,23 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, View, TouchableOpacity, SafeAreaView, Alert } from 'react-native';
 
-export default function App() {
+export default function LoginScreen({}) {
   const [studentNumber, setStudentNumber] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = () => {
     if (studentNumber === '' || password === '') {
       Alert.alert('Error', 'Please fill in both fields');
+      return;
+    }
+
+    // Placeholder logic for authentication
+    // Replace this with actual API call or authentication logic
+    if (studentNumber === '12345' && password === 'password') {
+      Alert.alert('Success', 'Login successful!');
+      // Navigate to the next screen after successful login
     } else {
-      // Handle login logic here (e.g., API call)
-      
+      Alert.alert('Error', 'Invalid student number or password');
     }
   };
 
@@ -58,7 +65,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F5F5F5',
     padding: 20,
-    margin: 20,
   },
   title: {
     fontSize: 28,
