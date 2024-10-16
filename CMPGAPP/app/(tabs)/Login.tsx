@@ -1,102 +1,74 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, TextInput, View, TouchableOpacity, SafeAreaView, Alert } from 'react-native';
+import { View, TextInput, Button, Text } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function LoginScreen({}) {
-  const [studentNumber, setStudentNumber] = useState('');
+import { StackNavigationProp } from '@react-navigation/stack';
+import Constants from 'expo-constants';
+
+const url = Constants.expoConfig?.extra?.MongoURL ?? '';
+
+// Define RootStackParamList directly in this file if it doesn't exist
+type RootStackParamList = {
+  Login: undefined;
+  Home: undefined;
+};
+
+type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
+
+interface Props {
+  navigation: LoginScreenNavigationProp;
+}
+
+const LoginScreen = ({ navigation }: Props) => {
+  const [userNumber, setUserNumber] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-  const handleLogin = () => {
-    if (studentNumber === '' || password === '') {
-      Alert.alert('Error', 'Please fill in both fields');
-      return;
-    }
+  const handleLogin = async () => {
+    try {
+      const response = await fetch({url}+'/login', { // Replace with your actual server IP or URL
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ user_number: userNumber, password: password }),
+      });
 
-    // Placeholder logic for authentication
-    // Replace this with actual API call or authentication logic
-    if (studentNumber === '12345' && password === 'password') {
-      Alert.alert('Success', 'Login successful!');
-      // Navigate to the next screen after successful login
-    } else {
-      Alert.alert('Error', 'Invalid student number or password');
+      const data = await response.json();
+
+      if (response.ok) {
+        await AsyncStorage.setItem('token', data.token); // Store the token securely
+        navigation.navigate('Home'); // Redirect to the home screen after successful login
+      } else {
+        setError(data.message); // Display error message
+      }
+    } catch (err) {
+      if (err instanceof Error) {
+        setError('An error occurred during login: ' + err.message);
+      } else {
+        setError('An unknown error occurred during login. No u');
+      }
     }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Student Login</Text>
-
-      {/* Student Number Input */}
+    <View>
       <TextInput
-        style={styles.input}
-        placeholder="Student Number"
+        placeholder="User Number"
+        value={userNumber}
+        onChangeText={(text) => setUserNumber(text)}
         keyboardType="numeric"
-        value={studentNumber}
-        onChangeText={text => setStudentNumber(text)}
-        autoCapitalize="none"
       />
-
-      {/* Password Input */}
       <TextInput
-        style={styles.input}
         placeholder="Password"
-        secureTextEntry={true}
         value={password}
-        onChangeText={text => setPassword(text)}
-        autoCapitalize="none"
+        onChangeText={(text) => setPassword(text)}
+        secureTextEntry
       />
-
-      {/* Login Button */}
-      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-        <Text style={styles.loginText}>Login</Text>
-      </TouchableOpacity>
-
-      {/* Forgot Password */}
-      <TouchableOpacity>
-        <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-      </TouchableOpacity>
-    </SafeAreaView>
+      <Button title="Login" onPress={handleLogin} />
+      {error && <Text>{error}</Text>}
+    </View>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5F5F5',
-    padding: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 40,
-  },
-  input: {
-    width: '100%',
-    height: 50,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    marginBottom: 20,
-    backgroundColor: '#FFF',
-  },
-  loginButton: {
-    backgroundColor: '#1E90FF',
-    paddingVertical: 15,
-    paddingHorizontal: 40,
-    borderRadius: 5,
-    width: '100%',
-    alignItems: 'center',
-  },
-  loginText: {
-    color: '#FFF',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  forgotPasswordText: {
-    color: '#1E90FF',
-    fontSize: 16,
-    marginTop: 20,
-  },
-});
+export default LoginScreen;

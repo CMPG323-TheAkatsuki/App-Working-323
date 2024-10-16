@@ -12,6 +12,13 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "extra": {
+      "JWT_SECRET": "helloworld",
+      "MongoUserName": "defaultuser",
+      "MongoPassword": "1115",
+      "MongoURL": "mongodb+srv://defaultuser:1115@cluster0.pzujk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+      "ENV": "development"
+    },
     "ios": {
       "supportsTablet": true
     },
